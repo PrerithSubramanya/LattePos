@@ -7,6 +7,7 @@ interface AuthContextProps {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  error: string | null;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
@@ -14,6 +15,7 @@ export const AuthContext = createContext<AuthContextProps>({
   user: null,
   login: async () => {},
   signOut: async () => {},
+  error: null,
 });
 
 interface AuthProviderProps {
@@ -24,6 +26,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [auth, setAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -50,14 +54,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       console.error('Login error:', error.message);
+      setError(error.message);
     } else {
       const { data, error } = await supabase.auth.getUser();
       if (error) {
         console.error('Error retrieving user:', error.message);
+        setError(error.message);
       } else {
         const { user: currentUser } = data;
         setUser(currentUser ?? null);
         setAuth(currentUser ? true : false);
+        setError(null);
       }
     }
   };
@@ -67,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, user, login, signOut }}>
+    <AuthContext.Provider value={{ auth, user, login, signOut, error }}>
       {!loading && children}
     </AuthContext.Provider>
   );

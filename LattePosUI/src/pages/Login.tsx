@@ -1,20 +1,30 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { FaGoogle, FaSun, FaMoon } from 'react-icons/fa';
 import { Button, SocialButton } from '../components/Buttons';
 import { Input } from '../components/Inputs';
 import { AuthContext } from '../context/AuthContext';
 import logo from '../assets/logo.svg'
+import { Toast } from '../components/Toast';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
-  const { login } = useContext(AuthContext);
+
+
+  const { login, error } = useContext(AuthContext);
+
 
   const handleLogin = async () => {
-    await login(email, password);
+      await login(email, password);
+      if (error) {
+        setToastMessage(error);
+        setShowToast(true);
+      }
   };
 
   const handleGoogleLogin = async () => {
@@ -65,6 +75,9 @@ const LoginPage: React.FC = () => {
           </SocialButton>
         </div>
       </div>
+      {showToast && (
+        <Toast message={toastMessage} onClose={() => setShowToast(false)}/>
+      )}
     </div>
   );
 };

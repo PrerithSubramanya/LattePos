@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { FaGoogle, FaSun, FaMoon } from 'react-icons/fa';
 import { Button, SocialButton } from '../components/Buttons';
 import { Input } from '../components/Inputs';
